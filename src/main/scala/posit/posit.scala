@@ -1,172 +1,11 @@
 package posit
 
+import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import java.math.BigInteger
-
-import posit.Example.{A_matrix, P_vector, b_vector, intSystem}
-
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-
-import scala.math.{abs, max, min, pow, sqrt}
-import Array._
-
-
-class BigFraction (val numerator : BigInt = 0, val denominator : BigInt = 1) {
-  var isZero : Boolean = numerator == 0
-  var isDividedByZero : Boolean = denominator == 0
-
-  /*
-  def gcd(a : BigInt, b : BigInt) : BigInt = {
-    b match {
-      case x if x==0 => a
-      case x if x>a => gcd(x,a)
-      case x => gcd(x, a%x)
-    }
-  }
-  */
-
-  def gcd(a : BigInt, b : BigInt) : BigInt = {
-    var a_aux : BigInt = a
-    var b_aux : BigInt = b
-    var aux : BigInt = 0
-    while(b_aux != 0) {
-      if (b_aux  > a_aux) {
-        aux = b_aux
-        b_aux = a_aux
-        a_aux = aux
-      } else {
-        aux = a_aux
-        a_aux = b_aux
-        b_aux = aux % b_aux
-      }
-    }
-    return a_aux
-  }
-
-  def normalize(return_numerator : BigInt, return_denominator : BigInt) : BigFraction = {
-    var return_gcd : BigInt = new BigInteger("1")
-    if(return_numerator!=0 && return_numerator.abs!=1 && return_denominator!=0 && return_denominator.abs!=1) {
-      return_gcd = gcd(return_numerator.abs, return_denominator.abs)
-    }
-    if (return_numerator == 0) {
-      return new BigFraction()
-    }
-    if(return_denominator < 0) {
-      return new BigFraction(return_numerator/return_gcd * -1, return_denominator/return_gcd * -1)
-    } else {
-      return new BigFraction(return_numerator/return_gcd, return_denominator/return_gcd)
-    }
-  }
+import scala.Array._
 
 
 
-  //BigFraction addition
-  def +(that : BigFraction) : BigFraction = {
-    var return_numerator : BigInt = this.numerator * that.denominator + this.denominator * that.numerator
-    var return_denominator : BigInt = this.denominator * that.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-
-  //BigFraction substition
-  def -(that : BigFraction) : BigFraction = {
-    var return_numerator : BigInt = this.numerator * that.denominator - this.denominator * that.numerator
-    var return_denominator : BigInt = this.denominator * that.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction multiply
-  def *(that : BigFraction) : BigFraction = {
-    var return_numerator : BigInt = this.numerator * that.numerator
-    var return_denominator : BigInt = this.denominator * that.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction divide
-  def /(that : BigFraction) : BigFraction = {
-    var return_numerator : BigInt = this.numerator * that.denominator
-    var return_denominator : BigInt = this.denominator * that.numerator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction divide
-  def inverse() : BigFraction = {
-    var return_numerator : BigInt = this.denominator
-    var return_denominator : BigInt = this.numerator
-    var return_value : BigFraction = new BigFraction(return_numerator, return_denominator)
-    return_value.isZero = return_value.numerator == 0
-    return_value.isDividedByZero = return_value.denominator == 0
-    return return_value
-  }
-
-  //BigFraction addition with Int
-  def +(that : Int) : BigFraction = {
-    var return_numerator : BigInt = this.numerator + this.denominator * that
-    var return_denominator : BigInt = this.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction substition with Int
-  def -(that : Int) : BigFraction = {
-    var return_numerator : BigInt = this.numerator - this.denominator * that
-    var return_denominator : BigInt = this.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction multiply with Int
-  def *(that : Int) : BigFraction = {
-    var return_numerator : BigInt = this.numerator * that
-    var return_denominator : BigInt = this.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction divide with Int
-  def /(that : Int) : BigFraction = {
-    var return_numerator : BigInt = this.numerator / that
-    var return_denominator : BigInt = this.denominator
-    var return_value : BigFraction = normalize(return_numerator, return_denominator)
-    return return_value
-  }
-
-  //BigFraction ==
-  def ==(that : BigFraction) : Boolean = {
-    return (this.numerator * that.denominator) == (this.denominator * that.numerator)
-  }
-
-  //BigFraction <
-  def <(that : BigFraction) : Boolean = {
-    return (this.numerator * that.denominator) < (this.denominator * that.numerator)
-  }
-
-  //BigFraction >
-  def >(that : BigFraction) : Boolean = {
-    return (this.numerator * that.denominator) > (this.denominator * that.numerator)
-  }
-
-  def isInteger() : Boolean = {
-    return (this.denominator == 1)
-  }
-
-  def toIntFraction() : IntFraction = {
-    return new IntFraction(this.numerator.toInt, this.denominator.toInt)
-  }
-
-  // Big Int to string
-  override def toString: String = {
-    return this.numerator.toString() + "/" + this.denominator.toString()
-  }
-}
 
 // TODO : AICI SE SCHIMBA IN INTț
 
@@ -1474,7 +1313,9 @@ class TestPosit (val size : Int) extends Serializable {
 
 
 
-  /*
+    /* TODO : FIRST TIME
+    val t0 = System.nanoTime()
+
     var multiply_matrix: Array[Array[TestPosit]] = ofDim[TestPosit](posit_values, posit_values)
     for (value_1 <- 1 until  posit_values/2) {
       posit_1.decodeBinary(value_1, max_exponent_size)
@@ -1485,20 +1326,22 @@ class TestPosit (val size : Int) extends Serializable {
         multiply_matrix (value_1) (value_2) = posit_3
       }
     }
+
+    val fos_4 = new FileOutputStream(this.size.toString + "_" + this.exponent_size.toString  + "multiply_matrix.ser")
+    val oos_4 = new ObjectOutputStream(fos_4)
+    oos_4.writeObject(multiply_matrix)
+    oos_4.close()
+    val t1 = System.nanoTime()
+    println("Multiplicare Elapsed time: " + (t1 - t0)/1000000000 + "s")
   */
     /* TODO: after first process */
-    val fis_4 = new FileInputStream(this.size.toString + "multiply_matrix.ser")
+    val fis_4 = new FileInputStream(this.size.toString + "_" + this.exponent_size.toString  + "multiply_matrix.ser")
     val ois_4 = new ObjectInputStream(fis_4)
     var multiply_matrix : Array[Array[TestPosit]] = ois_4.readObject.asInstanceOf[Array[Array[TestPosit]]]
     /**/
 
-    /* TODO: Only first time
-    val fos_4 = new FileOutputStream(this.size.toString + "multiply_matrix.ser")
-    val oos_4 = new ObjectOutputStream(fos_4)
-    oos_4.writeObject(multiply_matrix)
-    oos_4.close()
-    */
 
+    //return 0
     /*
     for (value_1 <- 1 until  posit_values/2) {
       for (value_2 <- 1 until  posit_values/2) {
@@ -1506,7 +1349,10 @@ class TestPosit (val size : Int) extends Serializable {
       }
       println();
     }
+    */
 
+  /* TODO : FIRST TIME
+    val t2 = System.nanoTime()
     var list_products : List[TestPosit] = List()
     for (value_1 <- 1 until  posit_values/2) {
       for (value_2 <- 1 until  posit_values/2) {
@@ -1520,29 +1366,42 @@ class TestPosit (val size : Int) extends Serializable {
 
 
 
-    println( "list : " + list_products.map((x : TestPosit) => x.toDouble()))
-    println( "list : " + list_products.map((x : TestPosit) => x.displayValue() + "\n"))
+   // println( "list : " + list_products.map((x : TestPosit) => x.toDouble()))
+   // println( "list : " + list_products.map((x : TestPosit) => x.displayValue() + "\n"))
 
     var posit_sort_multiply_values : Array[TestPosit] = new Array[TestPosit](list_products.length)
     list_products.copyToArray(posit_sort_multiply_values)
+
+
+
+    val fos_3 = new FileOutputStream(this.size.toString + "_" + this.exponent_size.toString + "posit_rank_values.ser")
+    val oos_3 = new ObjectOutputStream(fos_3)
+    oos_3.writeObject(posit_sort_multiply_values)
+    oos_3.close()
+
+
+    val t3 = System.nanoTime()
+    println("Sortare Elapsed time: " + (t3 - t2)/1000000000 + "s")
     */
 
     /* TODO: after first process */
-    val fis_3 = new FileInputStream(this.size.toString + "posit_rank_values.ser")
+    val fis_3 = new FileInputStream(this.size.toString + "_" + this.exponent_size.toString + "posit_rank_values.ser")
     val ois_3 = new ObjectInputStream(fis_3)
     var posit_sort_multiply_values : Array[TestPosit] = ois_3.readObject.asInstanceOf[Array[TestPosit]]
     /**/
 
 
-    //var rank_multiply_matrix: Array[Array[Int]] = ofDim[Int](posit_values, posit_values)
     /* TODO: after first process */
-    val fis_2 = new FileInputStream(this.size.toString + "rank_matrix.ser")
+    val fis_2 = new FileInputStream(this.size.toString + "_" + this.exponent_size.toString + "rank_matrix.ser")
     val ois_2 = new ObjectInputStream(fis_2)
     var rank_multiply_matrix: Array[Array[Int]] = ois_2.readObject.asInstanceOf[Array[Array[Int]]]
     /**/
+
+    val t4 = System.nanoTime()
     var rank : Int = 0
 
-    /*
+    /* TODO: FRIST TIME
+    var rank_multiply_matrix: Array[Array[Int]] = ofDim[Int](posit_values, posit_values)
     for (value_1 <- 1 until  posit_values/2) {
       for (value_2 <- 1 until  posit_values/2) {
         for (rank <- 0 until (posit_sort_multiply_values.length)) {
@@ -1552,25 +1411,45 @@ class TestPosit (val size : Int) extends Serializable {
         }
       }
     }
+
+    val fos_2 = new FileOutputStream(this.size.toString + "_" + this.exponent_size.toString + "rank_matrix.ser")
+    val oos_2 = new ObjectOutputStream(fos_2)
+    oos_2.writeObject(rank_multiply_matrix)
+    oos_2.close()
+
+    val t5 = System.nanoTime()
+    println("atrice de rankuri Elapsed time: " + (t5 - t4)/1000000000 + "s")
     */
 
-    /* TODO: ONLY First time
+
+    /*
+    Multiplicare Elapsed time: 2s
+    Sortare Elapsed time: 28s
+    atrice de rankuri Elapsed time: 64s
+     */
+    val t6 = System.nanoTime()
+    /* TODO: ONLY First time */
     var rankToIntVector : Array[Int] = new Array[Int](posit_sort_multiply_values.length)
     for (rank <- 0 until (rankToIntVector.length)) {
       rankToIntVector(rank) = -1
     }
     rankToIntVector(0) = 0
-    */
+    /**/
     //rankToIntVector(1) = 1
 
+    /*
     for (value_1 <- 1 until  posit_values/2) {
       for (value_2 <- 1 until  posit_values/2) {
         print(" " + rank_multiply_matrix(value_1)(value_2));
       }
       println();
     }
+     */
     var nr_variables : Int = posit_sort_multiply_values.length - 1
     var nr_equations : Int = ((posit_values/2) * (posit_values/2+1))
+    println("variabile:", nr_variables.toString)
+    println("ecuatii:", nr_equations.toString)
+
     var rankSystem : Array[Array[Int]] = ofDim(nr_equations, nr_variables)
 
     for (value_1 <- 0 until rankSystem.length ) {
@@ -1581,7 +1460,7 @@ class TestPosit (val size : Int) extends Serializable {
 
 
 
-    /* TODO: Only first time
+    /* TODO: Only first time */
     var index : Int = 0
     var rank_1 : Int = 0
     var rank_2 : Int = 0
@@ -1601,37 +1480,27 @@ class TestPosit (val size : Int) extends Serializable {
 
 
     var mySystem : IntHomogeneousSystem = new IntHomogeneousSystem(rankSystem)
-     */
-    //var solutionVectors : Array[Array[IntFraction]] = mySystem.makeSystem()
+     /**/
+    var solutionVectors : Array[Array[IntFraction]] = mySystem.makeSystem()
+
+    val fos_1 = new FileOutputStream(this.size.toString + "_" + this.exponent_size.toString + "solution_vectors.ser")
+    val oos_1 = new ObjectOutputStream(fos_1)
+    oos_1.writeObject(solutionVectors)
+    oos_1.close()
+    val t7 = System.nanoTime()
+    println("solutia sistemului de ecuatii pentru rankuri fara constrangeri Elapsed time: " + (t7 - t6)/1000000000 + "s")
 
 
-    /* TODO: after first process */
-    val fis_1 = new FileInputStream(this.size.toString + "solution_vectors.ser")
+
+    /* TODO: after first process
+    val fis_1 = new FileInputStream(this.size.toString + "_" + this.exponent_size.toString + "solution_vectors.ser")
     val ois_1 = new ObjectInputStream(fis_1)
     var solutionVectors : Array[Array[IntFraction]] = ois_1.readObject.asInstanceOf[Array[Array[IntFraction]]]
-    /**/
-
-    /* TODO: Only first time
-    val fos_1 = new FileOutputStream(this.size.toString + "rank_matrix.ser")
-    val oos_1 = new ObjectOutputStream(fos_1)
-    oos_1.writeObject(rank_multiply_matrix)
-    oos_1.close()
-
-    val fos_2 = new FileOutputStream(this.size.toString + "solution_vectors.ser")
-    val oos_2 = new ObjectOutputStream(fos_2)
-    oos_2.writeObject(solutionVectors)
-    oos_2.close()
-
-    val fos_3 = new FileOutputStream(this.size.toString + "posit_rank_values.ser")
-    val oos_3 = new ObjectOutputStream(fos_3)
-    oos_3.writeObject(posit_sort_multiply_values)
-    oos_3.close()
-
-     */
+    */
 
 
-
-    /* TODO: ONLY FIRST TIME
+    val t8 = System.nanoTime()
+    /* TODO: ONLY FIRST TIME */
     var A_matrix : Array[Array[IntFraction]] = ofDim(solutionVectors.length, solutionVectors(0).length-1)
     var b_vector : Array[IntFraction] = ofDim(solutionVectors.length)
     var P_vector : Array[IntFraction] =  ofDim(solutionVectors(0).length-1)
@@ -1649,7 +1518,7 @@ class TestPosit (val size : Int) extends Serializable {
     for ( index_1 <- 0 until P_vector.length) {
       P_vector(index_1) = new IntFraction(1)
     }
-     */
+    /* */
 
     /* EXAgerata varainta
     for ( index_1 <- 0 until solutionVectors(0).length-1) {
@@ -1684,18 +1553,18 @@ class TestPosit (val size : Int) extends Serializable {
     //val SimplexSystem : min_ge_SimpleMethod = new min_ge_SimpleMethod(A_matrix, b_vector, P_vector)
 
 
-    /* TODO: after the first process */
-    val fis_5 = new FileInputStream(this.size.toString + "rankToIntVector.ser")
+    /* TODO: after the first process
+    val fis_5 = new FileInputStream(this.size.toString + "_" + this.exponent_size.toString + "rankToIntVector.ser")
     val ois_5 = new ObjectInputStream(fis_5)
     var rankToIntVector : Array[Int] = ois_5.readObject.asInstanceOf[Array[Int]]
     println("rankuri finale")
     for (rank <- 0 until (rankToIntVector.length)) {
       print(rankToIntVector(rank) + " ")
     }
-    /* */
+     */
 
 
-    /* TODO: Only first time
+    /* TODO: Only first time */
     var sem : Boolean = false
     var S_vector_aux : Array[IntFraction] =  ofDim(A_matrix.length)
     for ( index_1 <- 0 until  A_matrix.length) {
@@ -1846,7 +1715,7 @@ class TestPosit (val size : Int) extends Serializable {
               print(rankToIntVector(rank) + " ")
             }
 
-            val fos_5 = new FileOutputStream(this.size.toString + "rankToIntVector.ser")
+            val fos_5 = new FileOutputStream(this.size.toString + "_" + this.exponent_size.toString + "rankToIntVector.ser")
             val oos_5 = new ObjectOutputStream(fos_5)
             oos_5.writeObject(rankToIntVector)
             oos_5.close()
@@ -1856,7 +1725,9 @@ class TestPosit (val size : Int) extends Serializable {
 
       }
     }
-    */
+    /**/
+    val t9 = System.nanoTime()
+    println("rezolvarea sistemul ILP Elapsed time: " + (t9 - t8)/1000000000 + "s")
 
     /* TODO : old way
     var sem : Boolean = false
@@ -1912,6 +1783,7 @@ class TestPosit (val size : Int) extends Serializable {
      */
     //TODO : CONTINUUUU
 
+    val t10 = System.nanoTime()
     var positToRank : Array[Int] = ofDim(posit_values/2)
     var positToInt : Array[Int] = ofDim(posit_values/2)
 
@@ -1946,6 +1818,9 @@ class TestPosit (val size : Int) extends Serializable {
     }
 
     //this.FindRank(rankToIntVector, rank_multiply_matrix, posit_values/2)
+
+    val t11 = System.nanoTime()
+    println("verificarea sistemului Elapsed time: " + (t11 - t10)/1000000000 + "s")
     return value_3
   }
 
@@ -2638,7 +2513,7 @@ class Big_SimplexMethod (val A_matrix : Array[Array[IntFraction]],
 }
 
 object Example extends App {
-  var my_posit: TestPosit = new TestPosit(8)
+  var my_posit: TestPosit = new TestPosit(10)
   var aux: BigInt = 0;
   var max_exponent_size: Int = 2
   var bigValue : BigInt = 0
